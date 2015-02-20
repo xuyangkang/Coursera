@@ -63,21 +63,43 @@ Theta2_grad = zeros(size(Theta2));
 %
 
 
+% Part 1:
+X = [ones(m,1), X];
+Z1 = X * Theta1';
+L1 = [ones(m, 1), sigmoid(Z1)];
+Z2 = L1 * Theta2';
+L2 = sigmoid(Z2);
+one_minus_L2 = ones(size(L2)) - L2;
+extracted_y = zeros(m, num_labels);
+for i = 1:m
+    extracted_y(i, y(i)) = 1;
+end
+one_minus_extracted_y = ones(size(extracted_y)) - extracted_y;
 
+J = sum(sum(-extracted_y .* log(L2) - one_minus_extracted_y .* ...
+            log(one_minus_L2))) / m;
 
+rate = lambda / m / 2;
+J += (sum(sum(Theta1 .* Theta1)) + sum(sum(Theta2 .* Theta2))) * rate;
 
+for i = 1:hidden_layer_size
+    J -= Theta1(i, 1) * Theta1(i, 1) * rate;
+end
 
+for i = 1:num_labels
+    J -= Theta2(i, 1) * Theta2(i, 1) * rate;
+end
 
+% Part2:
+delta2 = L2 - extracted_y;
+delta1 = delta2 * Theta2 .* sigmoidGradient([zeros(m, 1), Z1]);
+Theta2_grad += delta2' * L1 / m;
+Theta1_grad += (delta1' * X)(2:end,:) / m;
 
-
-
-
-
-
-
-
-
-
+Theta2(:,1) = 0;
+Theta1(:,1) = 0;
+Theta2_grad += Theta2 * lambda / m;
+Theta1_grad += Theta1 * lambda / m;
 
 
 % -------------------------------------------------------------
