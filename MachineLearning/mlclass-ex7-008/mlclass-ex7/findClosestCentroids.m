@@ -21,8 +21,18 @@ idx = zeros(size(X,1), 1);
 % Note: You can use a for-loop over the examples to compute this.
 %
 
-
-
+for i = 1:length(idx)
+    dist = 1E10;
+    idx(i) = 0;
+    for j = 1:K
+        delta = X(i, :) - centroids(j, :);
+        tmp = sum(delta .* delta);
+        if tmp < dist
+            dist = tmp;
+            idx(i) = j;
+        end
+    end
+end
 
 
 
